@@ -1,16 +1,12 @@
-import time
-
 import pygame
-import BallNet
 import Evolution
 pygame.init()
 
 window_w = 800
 window_h = 600
 
-white = (255, 255, 255)
 black = (0, 0, 0)
-red = (255, 0, 0)
+white = (255, 255, 255)
 
 FPS = 120
 
@@ -20,20 +16,24 @@ clock = pygame.time.Clock()
 
 number_of_balls = 1000
 
-moves = 500
+starting_moves = 500
 
 target = [400, 100]
+
+generation_saved = 20
+
+mutation_rate = 1
+
 
 
 def game_loop():
     velocity = [1, 1]
-    saved_velocity = velocity
     pos_x = window_w / 2
     pos_y = window_h / 2
 
     running = True
 
-    evolution = Evolution.Evolution(moves, number_of_balls, [pos_x, pos_y], window_w, window_h, window, target)
+    evolution = Evolution.Evolution(starting_moves, number_of_balls, [pos_x, pos_y], window_w, window_h, window, target)
 
     while running:
         freeze = False
@@ -44,7 +44,7 @@ def game_loop():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        evolution.Generation(freeze)
+        evolution.Step(freeze)
         clock.tick(FPS)
 
 

@@ -1,16 +1,17 @@
 import random
-import time
-
 import pygame
 import Ball
+import Evolution
 
 white = (255, 255, 255)
 black = (0, 0, 0)
 red = (255, 0, 0)
 
+ball_colours = ["BLACK", "GREEN", "RED", "ORANGE", "YELLOW" , "TURQUOISE", "BLUE"]
 
 class BallNet:
     def __init__(self, balls, start, width, height, window, target):
+        self.generation = 0
         self.balls = balls
         self.ball_list = []
         self.position = start
@@ -24,8 +25,20 @@ class BallNet:
         for i in range(self.balls):
             self.ball_list.append(Ball.Ball(self.window, self.position[0] + i / 100000, self.position[1] + i / 10000))
 
-    def move(self, frozen=False):
+    def move(self, generation, frozen=False):
+        self.generation = generation
         self.window.fill(white)
+
+        font = pygame.font.Font('freesansbold.ttf', 20)
+
+        text = font.render(f"Generation: {str(int(generation))}", True, black, white)
+
+        textRect = text.get_rect()
+
+        textRect.center = (75, 50)
+
+        self.window.blit(text, textRect)
+
         pygame.draw.circle(self.window, red, self.target, 5)
         if frozen:
             self.freeze_pos()
@@ -49,20 +62,18 @@ class BallNet:
                     print("Y direction violated")
                     current_ball.kill()
 
-                current_ball.draw()
+                current_ball.draw(current_ball.colour)
         pygame.display.update()
 
     def freeze_pos(self):
         for current_ball in self.ball_list:
-            current_ball.draw()
-
-    def freeze_screen(self):
-        time.sleep(5)
+            current_ball.draw(current_ball.colour, True)
 
     def reset_pos(self):
         for ball_num, current_ball, in enumerate(self.ball_list):
             current_ball.pos_x = self.starting_position[0]
             current_ball.pos_y = self.starting_position[1]
+            current_ball.colour = ball_colours[self.generation]
             current_ball.dead = False
 
     def distance_function(self):
