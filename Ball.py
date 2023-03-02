@@ -16,10 +16,11 @@ class Ball(pygame.sprite.Sprite):
         self.pos_y = pos_y
         self.window = window
         self.dead = False
+        self.past_moves = []
         # self.velocity = [randint(4, 8), randint(-8, 8)]
-        print("Drawing Balls")
 
     def draw(self):
+        self.past_moves.append([self.pos_x, self.pos_y])
         pygame.draw.circle(self.window, BLACK, [self.pos_x, self.pos_y], 5)
 
     def kill(self):
