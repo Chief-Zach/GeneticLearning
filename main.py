@@ -1,5 +1,6 @@
 import pygame
 import Evolution
+
 pygame.init()
 
 window_w = 800
@@ -16,24 +17,23 @@ clock = pygame.time.Clock()
 
 number_of_balls = 1000
 
-starting_moves = 500
+starting_moves = 400
 
 target = [400, 100]
 
 generation_saved = 20
 
-mutation_rate = 1
-
+mutation_rate = 2
 
 
 def game_loop():
-    velocity = [1, 1]
-    pos_x = window_w / 2
-    pos_y = window_h / 2
+    pos_x = 0
+    pos_y = 0
 
     running = True
 
-    evolution = Evolution.Evolution(starting_moves, number_of_balls, [pos_x, pos_y], window_w, window_h, window, target)
+    evolution = Evolution.Evolution(starting_moves, number_of_balls, [pos_x, pos_y], window_w, window_h, window, target,
+                                    generation_saved, mutation_rate)
 
     while running:
         freeze = False

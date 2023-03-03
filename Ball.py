@@ -16,17 +16,17 @@ BLUE = (0, 255, 255)
 class Ball(pygame.sprite.Sprite):
     # This class represents a ball. It derives from the "Sprite" class in Pygame.
 
-    def __init__(self, window, pos_x, pos_y, saved_moves=[]):
+    def __init__(self, window, pos_x, pos_y, colour, saved_moves=[]):
         super().__init__()
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.window = window
         self.dead = False
         self.saved_moves = saved_moves
-        self.colour = "BLACK"
-        self.saved_moves = saved_moves
+        self.generational_moves = []
+        self.colour = colour
         self.best_ball = False
-        # self.velocity = [randint(4, 8), randint(-8, 8)]
+        self.current_vector = []
 
     def draw(self, colour, frozen=False):
         match colour:
@@ -46,7 +46,7 @@ class Ball(pygame.sprite.Sprite):
                 colour = BLUE
 
         if not frozen:
-            self.saved_moves.append([self.pos_x, self.pos_y])
+            self.generational_moves.append(self.current_vector)
         pygame.draw.circle(self.window, colour, [self.pos_x, self.pos_y], 5)
 
     def kill(self):
