@@ -27,6 +27,7 @@ class Ball(pygame.sprite.Sprite):
         self.colour = colour
         self.best_ball = False
         self.current_vector = []
+        self.move = 0
 
     def draw(self, colour, frozen=False):
         match colour:

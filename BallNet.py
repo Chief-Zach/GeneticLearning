@@ -6,12 +6,12 @@ import Evolution
 white = (255, 255, 255)
 black = (0, 0, 0)
 red = (255, 0, 0)
-
+grey = (18, 18, 18)
 ball_colours = ["GREEN", "RED", "ORANGE", "YELLOW", "TURQUOISE", "BLUE"]
 
 
 class BallNet:
-    def __init__(self, balls, start, width, height, window, target, generation):
+    def __init__(self, balls, start, width, height, window, target, generation, total_moves, min_max_velocity):
         self.generation = generation
         self.balls = balls
         self.ball_list = []
@@ -23,10 +23,12 @@ class BallNet:
         self.window = window
         self.dead_count = 0
         self.target = target
+        self.total_moves = total_moves
+        self.min_max_velocity = min_max_velocity
 
-    def move(self, generation, move, frozen=False):
+    def move(self, generation, move, frozen=False, hidden=False):
         self.generation = generation
-        self.window.fill(white)
+        self.window.fill(grey)
 
         font = pygame.font.Font('freesansbold.ttf', 20)
 
@@ -38,7 +40,7 @@ class BallNet:
 
         self.window.blit(text, textRect)
 
-        pygame.draw.circle(self.window, black, self.target, 20)
+        pygame.draw.circle(self.window, white, self.target, 20)
         if frozen:
             self.freeze_pos()
             pygame.display.update()
@@ -51,7 +53,7 @@ class BallNet:
                     current_ball.pos_y += current_ball.saved_moves[move][1]
 
                 else:
-                    self.velocity = [random.randrange(-1, 2), random.randrange(-1, 2)]
+                    self.velocity = [random.randrange(-self.min_max_velocity, self.min_max_velocity + 1), random.randrange(-self.min_max_velocity, self.min_max_velocity + 1)]
                     current_ball.current_vector = self.velocity
                     current_ball.pos_x += self.velocity[0]
                     current_ball.pos_y += self.velocity[1]
@@ -65,8 +67,12 @@ class BallNet:
                         self.velocity[1] = -self.velocity[1]
                         print("Y direction violated")
                         current_ball.kill()
-
-                current_ball.draw(current_ball.colour)
+                if hidden:
+                    if current_ball.best_ball:
+                        current_ball.draw(current_ball.colour)
+                else:
+                    current_ball.draw(current_ball.colour)
+                current_ball.move = move
         pygame.display.update()
 
     def freeze_pos(self):
@@ -83,8 +89,9 @@ class BallNet:
     def distance_function(self):
         distance_list = {}
         for ball in self.ball_list:
-            distance = ((self.target[0] - ball.pos_x) ** 2 + (self.target[1] - ball.pos_y) ** 2) ** 1 / 2
-            distance_list[ball] = distance
+            distance = ((self.target[0] - ball.pos_x) ** 2 + (self.target[1] - ball.pos_y) ** 2) ** (1/2)
+            final_function = distance**5
+            distance_list[ball] = final_function + ball.move
         sorted_dict = dict(sorted(distance_list.items(), key=lambda item: item[1]))
         sorted_keys = list(sorted_dict.keys())
         return sorted_dict, sorted_keys
@@ -94,7 +101,6 @@ class BallNet:
             self.ball_list.append(Ball.Ball(self.window, self.starting_position[0], self.starting_position[1],
                                             ball_colours[self.generation % 6]))
         print(f"Currently {len(self.ball_list)} in the array")
-
 
     def create_ball(self, saved_moves):
         self.ball_list.append(Ball.Ball(self.window, self.starting_position[0], self.starting_position[1],
