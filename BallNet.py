@@ -29,7 +29,6 @@ class BallNet:
     def move(self, generation, move, best_score, frozen=False, hidden=False):
         self.generation = generation
         self.window.fill(grey)
-        best_count = 0
 
         font = pygame.font.Font('freesansbold.ttf', 20)
 
@@ -81,14 +80,12 @@ class BallNet:
                     current_ball.kill()
                     self.dead_count += 1
 
-                if hidden:
+                if hidden and generation != 0:
                     if current_ball.best_ball:
                         current_ball.draw(current_ball.colour)
                 else:
                     current_ball.draw(current_ball.colour)
                 current_ball.move = move
-            if current_ball.best_ball:
-                best_count += 1
         pygame.display.update()
         return self.dead_count
 

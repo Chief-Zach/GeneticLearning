@@ -4,10 +4,11 @@
 - Freeze's objects in their place and shows all objects if they are hidden
 #### "R" Key (Toggle)
 - Hides all objects except for the best path from the past generation
+- Works on second generation (generation 1) and onwards
 ## Hyper-Parameters
 
 - Number of balls
-  - The number of balls will allow you to reach the target faster by raising your odds of having a potitive mutation
+  - The number of balls will allow you to reach the target faster by raising your odds of having a positive mutation
   - This will cause the program to stutter depending on your computing power 
 - Starting Moves
   - This hyperparameter determines the number of moves that the AI can make in order to reach the target
