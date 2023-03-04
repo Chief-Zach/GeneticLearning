@@ -1,4 +1,5 @@
 # Genetic Learning
+![twitter](https://img.shields.io/twitter/follow/chiefz_sol?style=social)
 ## Features
 #### Space-bar (Hold)
 - Freeze's objects in their place and shows all objects if they are hidden
