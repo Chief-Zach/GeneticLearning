@@ -48,7 +48,8 @@ class Ball(pygame.sprite.Sprite):
 
         if not frozen:
             self.generational_moves.append(self.current_vector)
-        pygame.draw.circle(self.window, colour, [self.pos_x, self.pos_y], 5)
+        # pygame.draw.circle(self.window, colour, [self.pos_x, self.pos_y], 5)
+        pygame.draw.rect(self.window, colour, [self.pos_x, self.pos_y, 10, 10], True)
 
     def kill(self):
         self.dead = True

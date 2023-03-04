@@ -26,25 +26,40 @@ class BallNet:
         self.total_moves = total_moves
         self.min_max_velocity = min_max_velocity
 
-    def move(self, generation, move, frozen=False, hidden=False):
+    def move(self, generation, move, best_score, frozen=False, hidden=False):
         self.generation = generation
         self.window.fill(grey)
+        best_count = 0
 
         font = pygame.font.Font('freesansbold.ttf', 20)
 
-        text = font.render(f"Generation: {str(int(generation))}", True, black, white)
+        true_distance = best_score
 
-        textRect = text.get_rect()
+        if best_score <= self.total_moves:
+            true_distance = 0
+        elif best_score > self.total_moves:
+            true_distance = round((best_score - self.total_moves)**(1/5), 2)
 
-        textRect.center = (75, 50)
+        generation_text = font.render(f"Generation: {str(generation + 1)}", True, black, white)
+        best_score_text = font.render(f"Best Distance: {str(true_distance) if true_distance != -1 else 'None'}", True, black, white)
+        best_moves_text = font.render(f"Best Moves: {str(best_score) if (best_score-self.total_moves) <= 0 and best_score != 0 else 'Unsolved'}", True, black, white)
 
-        self.window.blit(text, textRect)
+        generation_box = generation_text.get_rect()
+        best_score_box = best_score_text.get_rect()
+        best_moves_box = best_score_text.get_rect()
+
+        generation_box.topleft = (75, 50)
+        best_score_box.topleft = (75, 70)
+        best_moves_box.topleft = (75, 90)
+
+        self.window.blit(generation_text, generation_box)
+        self.window.blit(best_score_text, best_score_box)
+        self.window.blit(best_moves_text, best_moves_box)
 
         pygame.draw.circle(self.window, white, self.target, 20)
         if frozen:
             self.freeze_pos()
             pygame.display.update()
-            print("Freezing")
             return 0
         for ball_num, current_ball in enumerate(self.ball_list):
             if not current_ball.dead:
@@ -58,22 +73,24 @@ class BallNet:
                     current_ball.pos_x += self.velocity[0]
                     current_ball.pos_y += self.velocity[1]
 
-                    if self.position[0] + 5 > self.width or self.position[0] < 0:
-                        self.velocity[0] = -self.velocity[0]
-                        print("X direction violated")
-                        current_ball.kill()
+                if current_ball.pos_x + 5 > self.width or current_ball.pos_x < 0:
+                    current_ball.kill()
+                    self.dead_count += 1
 
-                    if self.position[1] + 5 > self.height or self.position[1] < 0:
-                        self.velocity[1] = -self.velocity[1]
-                        print("Y direction violated")
-                        current_ball.kill()
+                elif current_ball.pos_y + 5 > self.height or current_ball.pos_y < 0:
+                    current_ball.kill()
+                    self.dead_count += 1
+
                 if hidden:
                     if current_ball.best_ball:
                         current_ball.draw(current_ball.colour)
                 else:
                     current_ball.draw(current_ball.colour)
                 current_ball.move = move
+            if current_ball.best_ball:
+                best_count += 1
         pygame.display.update()
+        return self.dead_count
 
     def freeze_pos(self):
         for current_ball in self.ball_list:
@@ -89,9 +106,12 @@ class BallNet:
     def distance_function(self):
         distance_list = {}
         for ball in self.ball_list:
-            distance = ((self.target[0] - ball.pos_x) ** 2 + (self.target[1] - ball.pos_y) ** 2) ** (1/2)
-            final_function = distance**5
-            distance_list[ball] = final_function + ball.move
+            if not ball.dead:
+                distance = ((self.target[0] - ball.pos_x) ** 2 + (self.target[1] - ball.pos_y) ** 2) ** (1/2)
+                final_function = distance**5
+                distance_list[ball] = final_function + ball.move
+            else:
+                distance_list[ball] = self.width**6
         sorted_dict = dict(sorted(distance_list.items(), key=lambda item: item[1]))
         sorted_keys = list(sorted_dict.keys())
         return sorted_dict, sorted_keys
